@@ -28,11 +28,14 @@ defmodule Parser do
     stars
   end
 
-  def gsf do
+  def get_stars_floki(_url) do
     url = 'https://github.com/rozap/exquery'
-    {:ok, {{_version, 200, _reasonPhrase}, _headers, body}} = :httpc.request(:get, {url, []}, [], [{:body_format, :binary}])
-    numAsText = Floki.find(body, "a.social-count.js-social-count") |> Floki.text
-    get_number_from_text(numAsText)
+    case :httpc.request(:get, {url, []}, [], [{:body_format, :binary}]) do
+      {:ok, {{_version, 200, _reasonPhrase}, _headers, body}} -> numAsText = Floki.find(body, "a.social-count.js-social-count") |> Floki.text
+                                                                 get_number_from_text(numAsText)
+                                                            _ -> :error
+    end
+    #{:ok, {{_version, 200, _reasonPhrase}, _headers, body}} = :httpc.request(:get, {url, []}, [], [{:body_format, :binary}])
   end
 
   defp get_number_from_text(text) do
@@ -57,7 +60,10 @@ defmodule Parser do
 
   def parse([head | tail], topic, resultList) do
       case topic_string?(head) do
-        true -> parse(tail, get_topic(head), resultList)
+        true -> case get_topic(head) do
+                  "Books" -> parse([], topic, resultList)
+                       _ -> parse(tail, get_topic(head), [%{topic: get_topic(head), show?: true, href: get_topic(head)} | resultList])
+                end
         false -> case ref_string?(head) do
                      true -> case get_params(topic, head) do
                           false -> parse(tail, topic, resultList)
@@ -69,7 +75,12 @@ defmodule Parser do
   end
 
   def parse([], _topic, resultList) do
-    Enum.reverse(resultList)
+    resList = Enum.reverse(resultList)
+    hrefs = for map <- resList do
+                Storage.create_data(map)
+                map.href
+            end
+    hrefs
   end
 
   def topic_string?(str) do
@@ -112,7 +123,8 @@ defmodule Parser do
       _ -> false
     end
     if topic && name && href && description do
-      %{topic: topic, name: name, href: href, description: description}
+      #stars = get_stars_floki(href)
+      %{topic: topic, show?: false, name: name, href: href, stars: 777, description: description}
     else
       false
     end

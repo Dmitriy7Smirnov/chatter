@@ -16,9 +16,8 @@ defmodule ChatterWeb.Router do
   scope "/", ChatterWeb do
     pipe_through :browser
 
-    get "/", PageController, :index
+    get "/", PageController, :myindex
 
-    get "/min_stars", PageController, :myindex
   end
 
   # Other scopes may use custom stacks.

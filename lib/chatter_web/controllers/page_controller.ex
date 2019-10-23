@@ -7,7 +7,8 @@ defmodule ChatterWeb.PageController do
 
   def myindex(conn, _params) do
     #Phoenix.View.render(ChatterWeb.PageView, "myindex.html.eex", %{})
-    contents = Parser.get_content()
+    hrefs = Parser.get_content()
+    contents = Storage.get_all_data(hrefs)
     stars = conn.query_params["min_stars"]
     IO.puts("Some text")
     IO.inspect(stars)

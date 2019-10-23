@@ -11,9 +11,10 @@ defmodule Chatter.Application do
       # Start the Ecto repository
       Chatter.Repo,
       # Start the endpoint when the application starts
-      ChatterWeb.Endpoint
+      ChatterWeb.Endpoint,
       # Starts a worker by calling: Chatter.Worker.start_link(arg)
       # {Chatter.Worker, arg},
+      Storage
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
