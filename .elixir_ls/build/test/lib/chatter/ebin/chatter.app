@@ -18,7 +18,7 @@
                         'Elixir.ChatterWeb.Router',
                         'Elixir.ChatterWeb.Router.Helpers',
                         'Elixir.ChatterWeb.UserSocket','Elixir.Parser',
-                        'Elixir.Storage']},
+                        'Elixir.Storage','Elixir.Utils']},
               {registered,[]},
               {vsn,"0.1.0"},
               {mod,{'Elixir.Chatter.Application',[]}}]}.

@@ -28,20 +28,36 @@ defmodule Parser do
     stars
   end
 
-  def get_stars_floki(_url) do
-    url = 'https://github.com/rozap/exquery'
-    case :httpc.request(:get, {url, []}, [], [{:body_format, :binary}]) do
-      {:ok, {{_version, 200, _reasonPhrase}, _headers, body}} -> numAsText = Floki.find(body, "a.social-count.js-social-count") |> Floki.text
+  def get_stars_floki(href) do
+    url = to_charlist(href)
+    #url = 'https://github.com/erlang/docker-erlang-otp'
+    stars = case :httpc.request(:get, {url, []}, [], [{:body_format, :binary}]) do
+      {:ok, {{_version, _status, _reasonPhrase}, _headers, body}} -> numAsText = Floki.find(body, "a.social-count.js-social-count") |> Floki.text
+                                                                #IO.inspect numAsText
                                                                  get_number_from_text(numAsText)
-                                                            _ -> :error
+                                                            _ -> "5555"
     end
+    #{href, stars}
+    #:httpc.request(:get, {url, []}, [], [{:body_format, :binary}])
+    #IO.inspect {href, stars}
+    #exit(:myreason)
+    IO.inspect "I am here too"
+    # IO.inspect is_bitstring(stars)
+    # IO.inspect String.to_integer(stars)
+    exit(%{href: href, stars: stars})
     #{:ok, {{_version, 200, _reasonPhrase}, _headers, body}} = :httpc.request(:get, {url, []}, [], [{:body_format, :binary}])
+  end
+
+  def get_stars_test(href) do
+    IO.inspect "I am here"
+    exit(%{href: href, stars: "888"})
+    #exit(:myreason)
   end
 
   defp get_number_from_text(text) do
     stars = case Regex.run(~r/(\d+)/, text) do
               [ _, stars] -> stars
-              _ -> false
+              _ -> "4444"
             end
     stars
   end
