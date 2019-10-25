@@ -25,7 +25,7 @@ defmodule Utils do
     etf(hrefs, [])
   end
 
-  defp etf([head1, head2, tail,], acc) do
+  defp etf([head1 | [head2 | tail]], acc) do
     if head1.show? == true and head2.show? == true do
       etf([head2, tail], acc)
     else
@@ -33,11 +33,11 @@ defmodule Utils do
     end
   end
 
-  defp etf([head1, []], acc) do
-    if head1.show? do
+  defp etf([head | []], acc) do
+    if head.show? do
       etf([], acc)
     else
-      etf([], [head1, acc])
+      etf([], [head, acc])
     end
   end
 
