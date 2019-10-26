@@ -31,7 +31,7 @@ end
   @impl true
   def handle_info(:init, state) do
     IO.inspect "IT IS HANDLE INFO INIT"
-    :observer.start()
+    #:observer.start()
     get_and_save()
     # Schedule work to be performed on start
     schedule_work()
@@ -76,39 +76,27 @@ end
     create_data(keys)
 
     #Process.flag(:trap_exit, true)
-    for href <- hrefs  do
-      :timer.sleep(500)
-      if not get_data(href).show? do
+    tasks = for href <- hrefs  do
+        #:timer.sleep(50)
+        if not get_data(href).show? do
           #spawn_link(Parser, :get_stars_test, [href])
-          spawn_monitor(Parser, :get_stars_floki, [href])
+          #spawn_monitor(Parser, :get_stars_floki, [href])
+          Task.async(Parser, :get_stars_floki, [href])
+        end
+    end
+    results = for task <- tasks do
+      if task != nil do
+        Task.await(task, 50000)
       end
     end
-  end
-
-  def get_stars_floki(href) do
-    url = to_charlist(href)
-    #url = 'https://github.com/erlang/docker-erlang-otp'
-    stars = case :httpc.request(:get, {url, []}, [], [{:body_format, :binary}]) do
-      {:ok, {{_version, _status, _reasonPhrase}, _headers, body}} -> numAsText = Floki.find(body, "a.social-count.js-social-count") |> Floki.text
-                                                                #IO.inspect numAsText
-                                                                 get_number_from_text(numAsText)
-                                                            _ -> :error1
+    for result <- results do
+      if result != nil do
+        add_stars(result.href, result.stars)
+      end
     end
-    #{href, stars}
-    #:httpc.request(:get, {url, []}, [], [{:body_format, :binary}])
-    #IO.inspect {href, stars}
-    #exit(:myreason)
-    exit(%{href: href, stars: stars})
-    #{:ok, {{_version, 200, _reasonPhrase}, _headers, body}} = :httpc.request(:get, {url, []}, [], [{:body_format, :binary}])
+    IO.puts "tasks finished"
   end
 
-  defp get_number_from_text(text) do
-    stars = case Regex.run(~r/(\d+)/, text) do
-              [ _, stars] -> stars
-              _ -> false
-            end
-    stars
-  end
 
   defp schedule_work do
     # In 1 day

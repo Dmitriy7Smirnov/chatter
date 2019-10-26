@@ -44,7 +44,8 @@ defmodule Parser do
     IO.inspect "I am here too"
     # IO.inspect is_bitstring(stars)
     # IO.inspect String.to_integer(stars)
-    exit(%{href: href, stars: stars})
+    #exit(%{href: href, stars: stars})
+    %{href: href, stars: stars}
     #{:ok, {{_version, 200, _reasonPhrase}, _headers, body}} = :httpc.request(:get, {url, []}, [], [{:body_format, :binary}])
   end
 
